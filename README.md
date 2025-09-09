@@ -3,7 +3,7 @@
 </pre>
 
 <div align="center">
-<img alt="Ryuchan Logo" src="https://picbed.xiaozhangya.xin/blog/log.png" width="280px">
+<img alt="Ryuchan Logo" src="https://picbed.xiaozhangya.xin/blog/logo.png" width="280px">
 </div>
 
 [![license](https://badgen.net/github/license/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/blob/main/LICENSE)&nbsp;&nbsp;&nbsp;[![release](https://badgen.net/github/release/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/releases)
