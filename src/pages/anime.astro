@@ -1,0 +1,91 @@
+---
+// 追番数据，部分字段已适配
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+// 请用你的完整 JSON 数据替换 animeList，确保每项有 id 和 media_type 字段
+import animeListRaw from "../../public/anime-list.json";
+const animeList = animeListRaw.flatMap((group) => group.items);
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import CardGroup from "@components/temple/CardGroup.astro";
+import Card from "@components/temple/Card.astro";
+---
+
+<BaseLayout title="追番列表">
+  <h1 class="text-3xl font-bold mb-8" style="color: var(--primary)">
+    追番列表
+  </h1>
+  <div class="flex gap-4 mb-6">
+    <button class="px-4 py-2 rounded bg-pink-500 text-white font-bold shadow">
+      追番数：{animeList.length}
+    </button>
+    <button class="px-4 py-2 rounded bg-yellow-500 text-white font-bold shadow">
+      平均评分：{
+        (
+          animeList.reduce(
+            (sum, a) =>
+              sum + (typeof a.vote_average === "number" ? a.vote_average : 0),
+            0,
+          ) / animeList.length
+        ).toFixed(2)
+      }
+    </button>
+  </div>
+  <CardGroup cols="4">
+    {
+      animeList.map((anime) => (
+        <Card>
+          <a
+            href={`https://www.themoviedb.org/${anime.media_type}/${anime.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group block h-full transition-transform duration-200 hover:scale-105 hover:shadow-lg rounded-xl relative overflow-hidden"
+            style="text-decoration: none;"
+          >
+            <div class="flex flex-col h-full">
+              <div class="relative">
+                <img
+                  src={TMDB_IMG + anime.poster_path}
+                  alt={anime.name || anime.title}
+                  class="w-full h-64 object-cover rounded-t-xl"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span class="bg-black/60 rounded-full p-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-8 w-8 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 5v14l11-7z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div class="p-4 flex-1 flex flex-col">
+                <h2
+                  class="text-lg font-bold mb-1"
+                  style="color: var(--primary); transition:color 0.2s;"
+                >
+                  {anime.name || anime.title}
+                </h2>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  {anime.media_type === "movie" ? "剧场版" : "TV"}
+                </div>
+                <div class="text-yellow-500 font-bold mb-2">
+                  评分：{anime.vote_average}
+                </div>
+              </div>
+            </div>
+          </a>
+        </Card>
+      ))
+    }
+  </CardGroup>
+</BaseLayout>
