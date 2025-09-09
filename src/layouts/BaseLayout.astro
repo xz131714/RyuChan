@@ -30,7 +30,7 @@ const {
 // 根据当前路径从配置中获取 Banner 内容
 const currentPath = Astro.url.pathname.replace("/", "") || "home";
 const pageConfig = SITE_PAGES?.[currentPath];
-const bannerTitle = pageConfig?.title || title;
+const bannerTitle = pageConfig?.title || title || "";
 const bannerSubtitle = pageConfig?.subtitle || "";
 ---
 
