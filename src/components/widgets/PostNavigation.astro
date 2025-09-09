@@ -1,0 +1,137 @@
+---    
+import type { CollectionEntry } from "astro:content";    
+import { Icon } from "astro-icon/components";  
+    
+interface Props {    
+  prevPost?: CollectionEntry<"blog">;    
+  nextPost?: CollectionEntry<"blog">;    
+}    
+    
+const { prevPost, nextPost } = Astro.props;    
+---    
+    
+<div class="post-navigation">    
+  <!-- 上一篇 -->    
+  {prevPost && (    
+    <a href={`/blog/${prevPost.slug}`} class="nav-card prev">    
+      <div class="nav-arrow left">  
+        &lt;
+      </div>  
+          
+      <div class="nav-content">    
+        <div class="nav-title">{prevPost.data.title}</div>    
+      </div>    
+    </a>    
+  )}    
+    
+  <!-- 下一篇 -->    
+  {nextPost && (    
+    <a href={`/blog/${nextPost.slug}`} class="nav-card next">    
+      <div class="nav-content">    
+        <div class="nav-title">{nextPost.data.title}</div>    
+      </div>    
+      <div class="nav-arrow right">  
+        &gt;  
+      </div>  
+    </a>    
+  )}    
+</div>    
+    
+<style>    
+  .post-navigation {    
+    display: flex;    
+    gap: 1rem;    
+    margin: 1.5rem 0;    
+  }    
+    
+  .nav-card {    
+    flex: 1;    
+    display: flex;    
+    align-items: center;    
+    padding: 1rem 1.5rem;    
+    background: oklch(var(--b1));    
+    border: 1px solid oklch(var(--b3));    
+    border-radius: 0.75rem;    
+    text-decoration: none;    
+    color: inherit;    
+    transition: all 0.2s ease;    
+    position: relative;    
+    min-height: 60px;    
+  }    
+    
+  .nav-card:hover {    
+    background: oklch(var(--p));    
+    border-color: oklch(var(--p));    
+    transform: translateY(-2px);    
+    box-shadow: 0 4px 12px oklch(var(--p) / 0.3);    
+  }    
+    
+  .nav-card:hover .nav-title {    
+    color: oklch(var(--pc));    
+  }    
+    
+  .nav-card:hover .nav-arrow {    
+    color: oklch(var(--pc));    
+  }    
+    
+  .nav-arrow {    
+    position: absolute;    
+    font-size: 1.2rem;    
+    color: oklch(var(--p));    
+    font-weight: bold;    
+    top: 50%;    
+    transform: translateY(-50%);    
+    transition: color 0.2s ease;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+  }    
+    
+  .nav-arrow.left {    
+    left: 1rem;    
+  }    
+    
+  .nav-arrow.right {    
+    right: 1rem;    
+  }    
+    
+  .nav-content {    
+    flex: 1;    
+    text-align: center;    
+    padding: 0 2.5rem;    
+  }    
+    
+  .nav-title {    
+    font-size: 0.9rem;    
+    font-weight: 500;    
+    color: oklch(var(--bc));    
+    line-height: 1.3;    
+    display: -webkit-box;    
+    -webkit-line-clamp: 2;    
+    -webkit-box-orient: vertical;    
+    overflow: hidden;    
+    transition: color 0.2s ease;    
+  }    
+    
+  /* 响应式设计 */    
+  @media (max-width: 768px) {    
+    .post-navigation {    
+      flex-direction: column;    
+      gap: 0.75rem;    
+    }    
+    
+    .nav-content {    
+      padding: 0 2rem;    
+    }    
+    
+    .nav-card {    
+      min-height: 50px;    
+      padding: 0.75rem 1rem;    
+    }    
+  }    
+    
+  /* 只有一个导航项时占满宽度 */    
+  .post-navigation:has(.nav-card:only-child) .nav-card {    
+    max-width: 100%;    
+  }    
+</style>

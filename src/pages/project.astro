@@ -1,0 +1,98 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import MainCard from "@/components/MainCard.astro";
+import BaseCard from "@/components/BaseCard.astro";
+import FriendCard from "@/components/mdx/FriendCard.astro";
+import GitHubStats from "@/components/mdx/GitHubStats.astro";
+import RepositoryCard from "@/components/mdx/RepositoryCard.astro";
+---
+
+<BaseLayout title="Projects">
+  <MainCard
+    infoIcon="lucide:code-2"
+  >
+       <!-- My Repositories -->
+    <section class="py-4">
+      <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        <Icon name="lucide:folder" class="w-6 h-6 text-primary" />
+        <span>My Projects</span>
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <FriendCard
+              name="HomePage"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366550828_avatar1.jpg"
+              description="🏠 小张的个人主页！"
+              url="https://xiaozhangya.xin"
+              type="friend"
+        />
+        <FriendCard
+              name="Blog"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366547338_avatar2.jpg"
+              description="🚂 二次元风格的Blog,第一次加载可能比较慢~ (ﾉ>ω<)ﾉ"
+              url="https://blog.xiaozhangya.xin"
+              type="friend"
+        />
+        <FriendCard
+              name="ImgBed"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366548855_avatar3.jpg"
+              description="🌄 Cloudflare-ImgBed + Telegram实现的无限存储图床~"
+              url="https://img.xiaozhangya.xin"
+              type="friend"
+        />
+        <FriendCard
+              name="OpenList"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366556506_avatar4.jpg"
+              description="✨ 网盘挂载器~当然也可以添加本机的存储哇 (≧∇≦)ﾉ"
+              url="https://op.xiaozhangya.xin"
+              type="friend"
+        />
+        <FriendCard
+              name="LibreTV"
+              avatar="https://picbed.xiaozhangya.xin/picbed/20250726182011085.png"
+              description="📺 LibreTV - 个人视频点播站，支持多种格式"
+              url="https://libretv.131714.xyz"
+              type="friend"
+        />
+
+        <FriendCard
+              name="MoonTV"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753524992480_avatar11.jpg"
+              description="🌙 MoonTV - 个人视频点播站，支持多种格式"
+              url="https://moontv.131714.xyz"
+              type="friend"
+        />
+
+        <FriendCard
+              name="Tipdm"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366554462_avatar5.jpg"
+              description="🏆 泰迪杯的一些项目代码🌷"
+              url="https://github.com/xz131714/Tipdm"
+              type="friend"
+        />
+        <FriendCard
+              name="PicBed"
+              avatar="https://img.xiaozhangya.xin/file/Avatar/1753366550329_avatar6.jpg"
+              description="🌄 PicGo+Github仓库的小图床awa"
+              url="https://github.com/xz131714/PicBed"
+              type="friend"
+        />
+      </div>
+
+      <div class="flex justify-center mt-10">
+        <a
+          href="https://github.com/xz131714?tab=repositories"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-outline gap-2"
+        >
+          <Icon name="lucide:github" class="w-5 h-5" />
+          <span>View More on GitHub</span>
+        </a>
+      </div>
+    </section>
+
+    
+  </MainCard>
+</BaseLayout>

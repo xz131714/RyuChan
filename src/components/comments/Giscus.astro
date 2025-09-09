@@ -1,0 +1,147 @@
+---    
+interface Props {    
+  repo: string;    
+  repoId: string;    
+  category: string;    
+  categoryId: string;    
+  mapping?: string;    
+  strict?: string;    
+  reactionsEnabled?: string;    
+  emitMetadata?: string;    
+  inputPosition?: string;    
+  lang?: string; 
+  loading?: string;
+     
+}    
+    
+const {    
+  repo,    
+  repoId,    
+  category,    
+  categoryId,    
+  mapping = "pathname",    
+  strict = "0",    
+  reactionsEnabled = "1",    
+  emitMetadata = "0",    
+  inputPosition = "top",    
+  lang = "zh-CN",
+  loading = "lazy",    
+} = Astro.props;    
+---    
+    
+<div id="giscus-container"></div>    
+    
+<script define:vars={{ repo, repoId, category, categoryId, mapping, strict, reactionsEnabled, emitMetadata, inputPosition, lang, loading }} is:inline>    
+  let giscusLoaded = false;    
+  let themeChangeTimeout;    
+    
+  function loadGiscus() {    
+    const container = document.getElementById('giscus-container');    
+    if (!container || giscusLoaded) return;    
+    
+    // 改进的主题检测逻辑  
+    let giscusTheme = 'light';  
+    const themeType = document.documentElement.getAttribute('data-theme-type');  
+    const dataTheme = document.documentElement.getAttribute('data-theme');  
+      
+    if (themeType) {  
+      giscusTheme = themeType === 'dark' ? 'dark' : 'light';  
+    } else if (dataTheme) {  
+      // 如果 data-theme-type 还没设置，从 data-theme 推断  
+      giscusTheme = dataTheme.includes('dark') || dataTheme === 'dracula' ? 'dark' : 'light';  
+    } else {  
+      // 最后的备选方案：检查系统偏好和 localStorage  
+      const storedTheme = localStorage.getItem('theme');  
+      if (storedTheme) {  
+        giscusTheme = storedTheme.includes('dark') || storedTheme === 'dracula' ? 'dark' : 'light';  
+      } else {  
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;  
+        giscusTheme = prefersDark ? 'dark' : 'light';  
+      }  
+    }  
+    
+    const script = document.createElement('script');    
+    script.src = 'https://giscus.app/client.js';    
+    script.setAttribute('data-repo', repo);    
+    script.setAttribute('data-repo-id', repoId);    
+    script.setAttribute('data-category', category);    
+    script.setAttribute('data-category-id', categoryId);    
+    script.setAttribute('data-mapping', mapping);    
+    script.setAttribute('data-strict', strict);    
+    script.setAttribute('data-reactions-enabled', reactionsEnabled);    
+    script.setAttribute('data-emit-metadata', emitMetadata);    
+    script.setAttribute('data-input-position', inputPosition);    
+    script.setAttribute('data-theme', giscusTheme);    
+    script.setAttribute('data-lang', lang);    
+    script.setAttribute('crossorigin', 'anonymous');   
+    script.setAttribute('data-loading', loading); 
+    script.async = true;    
+    
+    container.appendChild(script);    
+    giscusLoaded = true;    
+  }    
+    
+  function changeGiscusTheme(theme) {    
+    const iframe = document.querySelector('iframe.giscus-frame');    
+    if (iframe) {    
+      const container = document.getElementById('giscus-container');    
+      container.classList.add('theme-switching');    
+    
+      iframe.contentWindow.postMessage(    
+        { giscus: { setConfig: { theme } } },    
+        'https://giscus.app'    
+      );    
+    
+      setTimeout(() => {    
+        container.classList.remove('theme-switching');    
+      }, 300);    
+    }    
+  }    
+  
+  // 立即执行，不等待 DOM 加载完成  
+  loadGiscus();
+  // document.addEventListener('DOMContentLoaded', loadGiscus);    
+    
+  const observer = new MutationObserver((mutations) => {    
+    mutations.forEach((mutation) => {    
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme-type') {    
+        if (themeChangeTimeout) {    
+          clearTimeout(themeChangeTimeout);    
+        }    
+    
+        const themeType = document.documentElement.getAttribute('data-theme-type');    
+        const giscusTheme = themeType === 'dark' ? 'dark' : 'light';    
+    
+        if (giscusLoaded) {    
+          changeGiscusTheme(giscusTheme);    
+        }    
+      }    
+    });    
+  });    
+    
+  observer.observe(document.documentElement, {    
+    attributes: true,    
+    attributeFilter: ['data-theme-type']    
+  });    
+    
+  // 修改页面切换处理，添加延迟确保主题属性已设置  
+  document.addEventListener('astro:after-swap', () => {    
+    giscusLoaded = false;  
+    // 添加短暂延迟，等待主题属性同步  
+    setTimeout(() => {  
+      loadGiscus();  
+    }, 100);  
+  });    
+</script>    
+    
+<style>    
+  #giscus-container {    
+    margin-top: 2rem;    
+    margin-bottom: 2rem;    
+    transition: opacity 0.2s ease-in-out;    
+  }    
+    
+  #giscus-container.theme-switching {    
+    opacity: 0.8;    
+  }    
+</style>

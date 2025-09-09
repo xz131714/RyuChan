@@ -1,0 +1,72 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BaseCard from "@components/BaseCard.astro";
+import { t } from "@config";
+import { Icon } from "astro-icon/components";
+import { getAllPosts, getTagsWithCount, getTagColorClass, getTagFontSize } from "@utils/blogUtils";
+
+// 获取所有博客文章
+const allPosts = await getAllPosts();
+
+// 提取所有标签并统计其出现次数
+const tagMap = getTagsWithCount(allPosts);
+
+// 转换为数组并按计数排序（降序）
+const tagEntries = Array.from(tagMap.entries());
+tagEntries.sort((a, b) => b[1] - a[1]);
+
+// 找到最大和最小计数，用于缩放
+const maxCount = Math.max(...tagMap.values());
+const minCount = Math.min(...tagMap.values());
+
+// 计算总标签数
+const totalTags = tagMap.size;
+---
+
+<BaseLayout title={t("label.tagPage")}>
+  <BaseCard title={t("label.tagPage")}>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-2">
+        <Icon name="lucide:tag" class="w-6 h-6 text-secondary" />
+        <h1 id="h1" class="text-2xl md:text-3xl font-bold">{t("label.tagPage")}</h1>
+        <div class="badge badge-secondary">{totalTags} {t("label.totalTags")}</div>
+      </div>
+      <a href="/blog" class="btn btn-outline btn-sm gap-2">
+        <Icon name="lucide:book-open" class="w-4 h-4" />
+        <span>{t("label.backToBlog")}</span>
+      </a>
+    </div>
+    <div class="divider my-2"></div>
+    <p class="text-sm opacity-75">{t("label.tagsPageDescription")}</p>
+  </BaseCard>
+  <BaseCard title={t("label.tagPage")}>
+    <div class="tags-container">
+      {
+        tagEntries.length > 0 ? (
+          <div class="tags-cloud">
+            {tagEntries.map(([tag, count], index) => (
+              <a
+                href={`/blog/tag/${tag}`}
+                class={`tags-item ${getTagColorClass(count, maxCount)}`}
+                style={`font-size: ${getTagFontSize(count, maxCount, minCount)}rem;`}
+                data-count={count}
+                data-index={index}
+              >
+                <span class="tags-content">
+                  <Icon name="lucide:tag" />
+                  <span class="tags-text">{tag}</span>
+                  <span class="tags-count">{count}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <Icon name="ri:emotion-sad-line" class="empty-icon" />
+            <p class="empty-text">{t("label.noTag")}</p>
+          </div>
+        )
+      }
+    </div>
+  </BaseCard>
+</BaseLayout>

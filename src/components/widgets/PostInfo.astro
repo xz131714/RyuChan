@@ -1,0 +1,92 @@
+---  
+import { Icon } from "astro-icon/components";  
+import { t, umamiConfig } from "@config";  
+import type { PostData } from "@interfaces/data";  
+const { pubDate, badge, word, time, url } = Astro.props as PostData & { url?: string };  
+  
+// 从 URL 中提取 slug  
+const slug = url ? url.split('/').filter(Boolean).pop() : undefined;  
+---  
+  
+<div class="flex flex-col sm:flex-row sm:justify-between gap-y-2 mb-4 text-xs sm:text-sm opacity-75">  
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2">  
+    {  
+      pubDate && (  
+        <span class="flex items-center gap-1">  
+          <Icon name="lucide:calendar" class="h-4 w-4 flex-shrink-0" />  
+          <span class="truncate">{pubDate}</span>  
+        </span>  
+      )  
+    }  
+    {  
+      badge && (  
+        <span class="flex flex-wrap items-center gap-1">  
+          <Icon name="lucide:bookmark" class="h-4 w-4 flex-shrink-0" />  
+          <span class="truncate">{badge}</span>  
+        </span>  
+      )  
+    }  
+  </div>  
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2">  
+    <div class="flex items-center gap-1">  
+      <Icon name="lucide:book-open" class="h-4 w-4 flex-shrink-0" />  
+      <span class="truncate">{word} {t("label.wordCount")} · {time} {t("label.readTime")}</span>  
+    </div>  
+    {slug && (  
+      <div class="flex items-center gap-1">  
+        <Icon name="lucide:eye" class="h-4 w-4 flex-shrink-0" />  
+        <span class="truncate" id={`page-views-${slug}`}>加载中...</span>  
+      </div>  
+    )}  
+  </div>  
+</div>  
+  
+{slug && (  
+  <script define:vars={{ slug, umamiConfig }}>
+    // 获取文章浏览量统计，支持 websiteId 或 shareId
+    async function fetchPostViews() {
+      if (!umamiConfig.enable) {
+        return;
+      }
+      try {
+        // 优先使用配置文件中的 websiteId
+        let websiteId = umamiConfig.websiteId;
+        let token = undefined;
+        // 如果 shareId 存在，尝试获取 token（兼容旧用法）
+        if (umamiConfig.shareId) {
+          const shareResponse = await fetch(`${umamiConfig.baseUrl}/api/share/${umamiConfig.shareId}`);
+          if (shareResponse.ok) {
+            const shareData = await shareResponse.json();
+            websiteId = shareData.websiteId || websiteId;
+            token = shareData.token;
+          }
+        }
+        if (!websiteId) throw new Error('未配置 websiteId');
+        // 获取统计数据
+        const currentTimestamp = Date.now();
+        const statsUrl = `${umamiConfig.baseUrl}/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}&url=%2Fblog%2F${slug}&compare=false`;
+        const headers = token ? { 'x-umami-share-token': token } : {};
+        const statsResponse = await fetch(statsUrl, { headers });
+        if (!statsResponse.ok) {
+          throw new Error('获取统计数据失败');
+        }
+        const statsData = await statsResponse.json();
+        const pageViews = statsData.pageviews?.value || 0;
+        const visits = statsData.visits?.value || 0;
+        const displayElement = document.getElementById(`page-views-${slug}`);
+        if (displayElement) {
+          displayElement.textContent = `浏览量 ${pageViews} · 访问数 ${visits}`;
+        }
+      } catch (error) {
+        console.error('Error fetching page views for', slug, ':', error);
+        const displayElement = document.getElementById(`page-views-${slug}`);
+        if (displayElement) {
+          displayElement.textContent = '统计不可用';
+        }
+      }
+    }
+    // 页面加载完成后获取统计数据
+    fetchPostViews();
+    document.addEventListener('astro:page-load', fetchPostViews);
+  </script>
+)}

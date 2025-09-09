@@ -1,0 +1,211 @@
+---
+import {
+  SITE_TAB,
+  SITE_DESCRIPTION,
+  SITE_FAVICON,
+  SITE_LANGUAGE,
+  SITE_THEME,
+  umamiConfig,
+  SITE_PAGES,
+} from "@config";
+import { ClientRouter } from "astro:transitions";
+import ElementCrossing from "astro-vtbot/components/ElementCrossing.astro";
+import PointerOnNavigation from "astro-vtbot/components/PointerOnNavigation.astro";
+import Header from "@components/Header.astro";
+import Sidebar from "@components/Sidebar.astro";
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Banner from "@components/Banner.astro";
+import MobileTOC from "@components/widgets/MobileTOC.astro";
+
+const {
+  title,
+  image,
+  headings = [],
+  showTOC = false,
+  isIndexed = true,
+  isPostPage = false,
+} = Astro.props;
+
+// 根据当前路径从配置中获取 Banner 内容
+const currentPath = Astro.url.pathname.replace("/", "") || "home";
+const pageConfig = SITE_PAGES?.[currentPath];
+const bannerTitle = pageConfig?.title || title;
+const bannerSubtitle = pageConfig?.subtitle || "";
+---
+
+<!doctype html>
+<html
+  lang={SITE_LANGUAGE}
+  style="background-color: var(--custom-page-bg)"
+  data-theme={SITE_THEME.light}
+  data-theme-type="light"
+>
+  <head>
+    <ClientRouter />
+    <ElementCrossing />
+    <PointerOnNavigation />
+    <Header
+      description={SITE_DESCRIPTION}
+      favicon={SITE_FAVICON}
+      image={image}
+    />
+    <title>{`${title} - ${SITE_TAB}`}</title>
+
+    <!-- Umami分析（自建） -->
+    {
+      umamiConfig.enable && (
+        <script
+          defer
+          src={`${umamiConfig.baseUrl}/script.js`}
+          data-website-id={umamiConfig.websiteId}
+        />
+      )
+    }
+
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments);
+          };
+        t = l.createElement(r);
+        t.async = 1;
+        t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "skz108rus8");
+    </script>
+
+    <!-- 主题管理脚本 -->
+    <script define:vars={{ SITE_THEME }} is:inline>
+      (function () {
+        const storedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        let theme;
+        if (storedTheme) {
+          theme = storedTheme;
+        } else {
+          theme = prefersDark ? SITE_THEME.dark : SITE_THEME.light;
+          localStorage.setItem("theme", theme);
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+        const themeType = theme === SITE_THEME.dark ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme-type", themeType);
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", (e) => {
+            if (!localStorage.getItem("theme")) {
+              const newTheme = e.matches ? SITE_THEME.dark : SITE_THEME.light;
+              document.documentElement.setAttribute("data-theme", newTheme);
+              const newThemeType = e.matches ? "dark" : "light";
+              document.documentElement.setAttribute(
+                "data-theme-type",
+                newThemeType,
+              );
+              localStorage.setItem("theme", newTheme);
+            }
+          });
+      })();
+    </script>
+  </head>
+
+  <!-- 移除上边距，让Banner从顶部开始 -->
+  <body
+    class="flex flex-col min-h-screen"
+    {...isIndexed ? { "data-pagefind-body": true } : {}}
+  >
+    <Banner title={bannerTitle} subtitle={bannerSubtitle} />
+    <Navbar />
+    <div class="max-w-blog mx-auto w-full flex-grow">
+      <div
+        class="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-4 gap-4 px-4 pb-4 h-full"
+      >
+        <main
+          class="col-span-1 md:col-span-4 lg:col-span-3 bg-transparent order-1 md:order-2 flex flex-col gap-4"
+        >
+          <div class="flex-grow flex flex-col gap-4">
+            <slot />
+          </div>
+          <Footer />
+        </main>
+        <aside class="col-span-1 bg-transparent order-2 md:order-1 md:top-4">
+          <Sidebar headings={headings} showTOC={showTOC} />
+          <slot name="sidebar" />
+        </aside>
+      </div>
+    </div>
+
+    <MobileTOC headings={headings} showTOC={showTOC} />
+
+    <!-- 其余脚本保持不变 -->
+    <script define:vars={{ SITE_THEME }} is:inline>
+      document.addEventListener("astro:after-swap", () => {
+        const storedTheme = localStorage.getItem("theme");
+        if (storedTheme) {
+          document.documentElement.setAttribute("data-theme", storedTheme);
+          const themeType = storedTheme === SITE_THEME.dark ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme-type", themeType);
+        }
+      });
+    </script>
+
+    <script is:inline>
+      document.addEventListener("astro:page-load", () => {
+        document.querySelectorAll(".btn-copy").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const codeBlock = button.closest(".ryuchan-code");
+            const code = codeBlock.querySelector("code").textContent;
+            const copyIcon = button.querySelector(
+              ".ryuchan-code-toolbar-copy-icon",
+            );
+            const successIcon = button.querySelector(
+              ".ryuchan-code-toolbar-copy-success",
+            );
+            try {
+              await navigator.clipboard.writeText(code);
+              copyIcon.classList.add("hidden");
+              successIcon.classList.remove("hidden");
+              button.classList.add("copy-success");
+              setTimeout(() => {
+                copyIcon.classList.remove("hidden");
+                successIcon.classList.add("hidden");
+                button.classList.remove("copy-success");
+              }, 2000);
+            } catch (err) {
+              console.error("Failed to copy:", err);
+            }
+          });
+        });
+      });
+    </script>
+
+    <style is:inline>
+      .btn-copy {
+        position: relative;
+        overflow: hidden;
+      }
+      .copy-success {
+        animation: pulse 0.5s ease-in-out;
+      }
+  .ryuchan-code-toolbar-copy-success svg {
+        color: #10b981;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </body>
+</html>

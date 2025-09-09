@@ -1,0 +1,171 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BaseCard from "@components/BaseCard.astro";
+import { t } from "@config";
+import { Icon } from "astro-icon/components";
+import dayjs from "@utils/dayjs";
+import { DATE_FORMAT } from "@config";
+import type { CollectionEntry } from "astro:content";
+import { getAllPosts, getCategoriesWithPosts, getCategoryColorClass } from "@utils/blogUtils";
+
+// 获取所有博客文章
+const allPosts = await getAllPosts();
+
+// 提取所有分类并按分类对文章进行分组
+const categoryMap = getCategoriesWithPosts(allPosts);
+
+// 转换为数组并按字母顺序排序
+const categoryEntries = Array.from(categoryMap.entries());
+categoryEntries.sort((a, b) => a[0].localeCompare(b[0]));
+
+// 对每个分类中的文章按日期排序（最新的排在前面）
+categoryEntries.forEach(([_, posts]) => {
+  posts.sort(
+    (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+      new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+  );
+});
+
+// 统计总分类数
+const totalCategories = categoryMap.size;
+---
+
+<BaseLayout title={t("label.categoryPage")}>
+  <BaseCard title={t("label.categoryPage")}>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-2">
+        <Icon name="lucide:folder" class="w-6 h-6 text-primary" />
+        <h1 id="h1" class="text-2xl md:text-3xl font-bold">{t("label.categoryPage")}</h1>
+        <div class="badge badge-primary">{totalCategories} {t("label.totalCategories")}</div>
+      </div>
+      <a href="/blog" class="btn btn-outline btn-sm gap-2">
+        <Icon name="lucide:book-open" class="w-4 h-4" />
+        <span>{t("label.backToBlog")}</span>
+      </a>
+    </div>
+    <div class="divider my-2"></div>
+    <p class="text-sm opacity-75">{t("label.categoriesPageDescription")}</p>
+  </BaseCard>
+  <BaseCard title={t("label.categoryPage")}>
+    <div class="categories-container">
+      {
+        categoryEntries.length > 0 ? (
+          <div class="categories-grid">
+            {categoryEntries.map(([category, posts], index) => (
+              <div class="category-card" data-index={index}>
+                <div class={`category-inner ${getCategoryColorClass(index)}`}>
+                  <div class="category-header" data-category={category}>
+                    <div class="category-title">
+                      <div class="category-icon">
+                        <Icon name="lucide:folder" />
+                      </div>
+                      <h2>{category}</h2>
+                      <span class="category-count">{posts.length}</span>
+                    </div>
+                    <button class="toggle-btn" aria-label="Toggle category content">
+                      <Icon name="ri:arrow-down-s-line" class="toggle-icon" />
+                    </button>
+                  </div>
+                  <div class="category-content scrollbar-none">
+                    <div class="category-divider" />
+                    <ul class="post-list">
+                      {posts.map((post) => (
+                        <li class="post-item">
+                          <a href={`/blog/${post.slug}`} class="post-link">
+                            <span class="post-title">{post.data.title}</span>
+                            <span class="post-date">{dayjs(post.data.pubDate).format(DATE_FORMAT)}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <Icon name="ri:emotion-sad-line" class="empty-icon" />
+            <p class="empty-text">{t("label.noCategory")}</p>
+          </div>
+        )
+      }
+    </div>
+  </BaseCard>
+</BaseLayout>
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const MAX_HEIGHT_PX = 500;
+
+    const collapseCategory = (contentEl: HTMLElement, iconEl: HTMLElement | null, innerEl: HTMLElement | null) => {
+      if (contentEl) {
+        contentEl.style.maxHeight = "0px";
+        contentEl.classList.remove("expanded");
+      }
+      if (iconEl) {
+        iconEl.classList.remove("rotate-180");
+      }
+      if (innerEl) {
+        innerEl.classList.remove("expanded");
+      }
+    };
+
+    const expandCategory = (contentEl: HTMLElement, iconEl: HTMLElement, innerEl: HTMLElement) => {
+      if (contentEl) {
+        const scrollHeight = contentEl.scrollHeight;
+        contentEl.style.maxHeight = Math.min(scrollHeight, MAX_HEIGHT_PX) + "px";
+        contentEl.classList.add("expanded");
+      }
+      if (iconEl) {
+        iconEl.classList.add("rotate-180");
+      }
+      if (innerEl) {
+        innerEl.classList.add("expanded");
+      }
+    };
+
+    const categoryHeaders = document.querySelectorAll(".category-header");
+
+    categoryHeaders.forEach((header) => {
+      const card = header.closest(".category-card");
+      if (!card) return;
+
+      const content = card.querySelector(".category-content") as HTMLElement;
+      const toggleIcon = header.querySelector(".toggle-icon") as HTMLElement;
+      const inner = card.querySelector(".category-inner") as HTMLElement;
+
+      // Initialize maxHeight for all content HTMLElements
+      if (content) {
+        if (content.classList.contains("expanded")) {
+          // If initially expanded by class, set maxHeight appropriately
+          const scrollHeight = content.scrollHeight;
+          content.style.maxHeight = Math.min(scrollHeight, MAX_HEIGHT_PX) + "px";
+        } else {
+          content.style.maxHeight = "0px"; // Start collapsed
+        }
+      }
+
+      header.addEventListener("click", () => {
+        if (!content || !toggleIcon || !inner) return;
+
+        const isCurrentlyExpanded = content.classList.contains("expanded") && content.style.maxHeight !== "0px";
+
+        if (isCurrentlyExpanded) {
+          collapseCategory(content, toggleIcon, inner);
+        } else {
+          document.querySelectorAll(".category-content.expanded").forEach((openContent) => {
+            if (openContent !== content) {
+              const otherCard = openContent.closest(".category-card");
+              if (otherCard) {
+                const otherToggleIcon = otherCard.querySelector(".toggle-icon") as HTMLElement;
+                const otherInner = otherCard.querySelector(".category-inner") as HTMLElement;
+                collapseCategory(openContent as HTMLElement, otherToggleIcon, otherInner);
+              }
+            }
+          });
+          expandCategory(content, toggleIcon, inner);
+        }
+      });
+    });
+  });
+</script>

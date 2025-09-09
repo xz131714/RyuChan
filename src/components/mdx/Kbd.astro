@@ -1,0 +1,15 @@
+---
+interface Props {
+  size?: "sm" | "md" | "lg";
+}
+
+const { size = "md" } = Astro.props;
+
+const sizeClasses = {
+  sm: "kbd-sm",
+  md: "",
+  lg: "kbd-lg",
+};
+---
+
+<kbd class:list={["kbd not-prose", sizeClasses[size]]}><slot /></kbd>

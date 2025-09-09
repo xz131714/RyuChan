@@ -1,0 +1,132 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import License from "@components/widgets/License.astro";
+import PostInfo from "@components/widgets/PostInfo.astro";
+import PostFilter from "@components/widgets/PostFilter.astro";
+import PostNavigation from "@components/widgets/PostNavigation.astro";
+import { type CollectionEntry, getCollection } from "astro:content";
+import dayjs from "@utils/dayjs";
+import { DATE_FORMAT } from "@config";
+import MainCard from "@/components/MainCard.astro";
+import Giscus from "@components/comments/Giscus.astro";
+import Waline from "@components/comments/Waline.astro";
+import { commentsConfig } from "@config";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  // 过滤草稿并按发布日期排序
+  const publishedPosts = posts
+    .filter((post) => !post.data.draft)
+    .sort(
+      (a, b) =>
+        new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+    );
+
+  return publishedPosts.map((blog, index) => {
+    const prevPost =
+      index < publishedPosts.length - 1 ? publishedPosts[index + 1] : null;
+    const nextPost = index > 0 ? publishedPosts[index - 1] : null;
+
+    return {
+      params: { slug: blog.slug },
+      props: { blog, prevPost, nextPost },
+    };
+  });
+}
+
+interface Props {
+  blog: CollectionEntry<"blog">;
+  prevPost?: CollectionEntry<"blog">;
+  nextPost?: CollectionEntry<"blog">;
+}
+
+const { blog, prevPost, nextPost } = Astro.props;
+const { Content, remarkPluginFrontmatter, headings } = await blog.render();
+const displayDate = blog.data.pubDate
+  ? dayjs(blog.data.pubDate).format(DATE_FORMAT)
+  : "";
+const url = new URL(`/${blog.slug}`, Astro.url.origin);
+---
+
+<BaseLayout
+  title={blog.data.title}
+  image={blog.data.image}
+  headings={headings}
+  showTOC={true}
+  isPostPage={true}
+>
+  <MainCard
+    title={blog.data.title}
+    description={blog.data.description}
+    image={blog.data.image}
+    infoIcon="lucide:info"
+  >
+    <!-- Article info using PostInfo component -->
+    <PostInfo
+      pubDate={displayDate}
+      badge={blog.data.badge}
+      word={remarkPluginFrontmatter.totalCharCount}
+      time={remarkPluginFrontmatter.readingTime}
+      url={`/blog/${blog.slug}`}
+    />
+
+    <!-- Categories and tags using PostFilter component -->
+    <div class="mb-6">
+      <PostFilter categories={blog.data.categories} tags={blog.data.tags} />
+    </div>
+
+    <!-- Article Content -->
+    <div class="mt-8">
+      <div
+        id="content"
+        class="prose max-w-none prose-headings:scroll-mt-20 prose-img:rounded-xl prose-img:mx-auto prose-img:cursor-pointer"
+      >
+        <Content />
+        <License
+          url={url.toString()}
+          title={blog.data.title}
+          image={blog.data.image}
+          pubDate={blog.data.pubDate}
+          badge={blog.data.badge}
+          categories={blog.data.categories}
+          tags={blog.data.tags}
+          word={remarkPluginFrontmatter.totalCharCount}
+          time={remarkPluginFrontmatter.readingTime}
+        />
+      </div>
+    </div>
+  </MainCard>
+
+  <!-- 添加文章导航 -->
+  <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+
+  <!-- Comments Section -->
+  {
+    commentsConfig?.enable &&
+      commentsConfig.type === "giscus" &&
+      commentsConfig.giscus && (
+        <section class="comments">
+          <h2>Comments</h2>
+          <Giscus {...commentsConfig.giscus} />
+        </section>
+      )
+  }
+  {
+    commentsConfig?.enable &&
+      commentsConfig.type === "waline" &&
+      commentsConfig.waline && (
+        <section class="comments">
+          <h2>Comments</h2>
+          <Waline {...commentsConfig.waline} />
+        </section>
+      )
+  }
+
+  <!-- 在页面底部添加 Fancybox 初始化脚本 -->
+  <script>
+    import("@fancyapps/ui").then(({ Fancybox }) => {
+      Fancybox.bind("#content img:not(a img)");
+    });
+  </script>
+</BaseLayout>

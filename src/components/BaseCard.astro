@@ -1,0 +1,15 @@
+---
+import { Image } from "astro:assets";
+import type { PostData } from "@interfaces/data";
+import Card from "@components/temple/Card.astro";
+const { title, image } = Astro.props as PostData;
+---
+
+<Card>
+  <div id="image-container">
+    {image && <Image src={image} width="1920" height="1080" alt={title} loading="eager" />}
+  </div>
+  <div class="p-4 sm:p-6">
+    <slot />
+  </div>
+</Card>

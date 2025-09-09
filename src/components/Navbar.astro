@@ -1,0 +1,259 @@
+---      
+import { Icon } from "astro-icon/components";      
+import ThemeToggle from "./widgets/ThemeToggle.astro";      
+import { SITE_TITLE, SITE_MENU } from "../config";      
+      
+// Get current path to determine active link      
+const currentPath = Astro.url.pathname;      
+const className = Astro.props.class;      
+      
+// Type safely process SITE_MENU before rendering      
+type SubMenuItem = {      
+  id: string;      
+  text: string;      
+  href: string;      
+  svg: string;      
+  target?: string;      
+};      
+      
+type MenuItem = {      
+  id: string;      
+  text: string;      
+  href: string;      
+  svg: string;      
+  target?: string;      
+  subItems?: SubMenuItem[];      
+};      
+      
+// Ensure the menu is properly typed      
+const typedMenu = SITE_MENU as MenuItem[];      
+---      
+      
+<!-- 桌面端透明导航栏 -->      
+<nav class="fixed top-0 left-0 right-0 z-50 hidden md:block">      
+  <div class="max-w-blog mx-auto px-4">      
+    <!-- 透明背景，添加毛玻璃效果 -->      
+    <div class="bg-transparent backdrop-blur-md border-none px-6 py-3 rounded-bl-2xl rounded-br-2xl">      
+      <div class="flex items-center justify-between">      
+
+        <!-- 品牌标识 - 使用主题色 -->        
+        <a href="/" class="flex items-center space-x-2 hover:scale-105 transition-transform duration-300">        
+          <Icon name="material-symbols:home-outline-rounded" class="text-4xl text-primary" />        
+          <span class="text-3xl font-bold tracking-tight text-primary">{SITE_TITLE}</span>        
+        </a>      
+              
+        <!-- 桌面端水平菜单 - 响应主题颜色 -->      
+        <div class="flex items-center space-x-1">      
+          {typedMenu.map((item) => (      
+            item.subItems ? (      
+              <div class="dropdown dropdown-hover">      
+                <div tabindex="0" role="button" class="btn btn-ghost text-xl md:text-3xl lg:text-xl font-bold px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 text-base-content">      
+                  <span>{item.text}</span>      
+                  <Icon name="material-symbols:keyboard-arrow-down" class="w-4 h-4 ml-1" />      
+                </div>      
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-lg border border-base-200 w-52 mt-2">      
+                  {item.subItems.map((subItem) => (      
+                    <li>      
+                      <a       
+                        href={subItem.href}       
+                        target={subItem.target || "_self"}       
+                        class="px-4 py-2 hover:bg-base-200 rounded-lg text-base md:text-2xl lg:text-base font-bold transition-all duration-200"      
+                      >      
+                        {subItem.text}      
+                      </a>      
+                    </li>      
+                  ))}      
+                </ul>      
+              </div>      
+            ) : (      
+              <a       
+                href={item.href}       
+                target={item.target || "_self"}       
+                class="btn btn-ghost text-xl md:text-3xl lg:text-xl font-bold px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 text-base-content"      
+              >      
+                {item.text}      
+              </a>      
+            )      
+          ))}      
+                
+          <!-- 搜索栏 - 透明样式 -->      
+          <div class="relative ml-4">      
+            <form action="/blog/search" method="get" class="relative">      
+              <input       
+                type="text"       
+                name="q"       
+                placeholder="搜索..."       
+                class="input input-sm bg-white/10 border-white/20 rounded-lg pl-10 pr-4 w-48 h-10 focus:outline-none focus:ring-2 focus:ring-white/30 text-white placeholder-white/70"       
+                aria-label="搜索"      
+              />      
+              <Icon name="material-symbols:search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />      
+            </form>      
+          </div>      
+        </div>      
+              
+        <!-- 右侧工具栏 -->      
+        <div class="flex items-center space-x-2">      
+          <!-- 主题切换 -->      
+          <ThemeToggle className="btn btn-ghost btn-circle hover:bg-white/10 text-primary" />      
+        </div>      
+      </div>      
+    </div>      
+  </div>      
+</nav>      
+      
+<!-- 移动端导航栏 - 透明样式 -->      
+<nav      
+  class="navbar fixed px-2 w-full transform transition-transform delay-300 duration-500 ease-in-out text-center z-50 bg-transparent backdrop-blur-md shadow-lg md:hidden"      
+  id="navbar"      
+>      
+  <div class="navbar-start">      
+    <label class="btn btn-circle btn-md bg-white/10 swap swap-rotate">      
+      <span class="sr-only">Toggle menu</span>      
+      <input type="checkbox" id="menu-toggle" />      
+      <Icon name="material-symbols:menu" class="swap-off h-5 w-5 text-white" />      
+      <Icon name="material-symbols:close" class="swap-on h-5 w-5 text-white" />      
+    </label>      
+  </div>      
+      
+  <div class="navbar-center">      
+    <a class="btn btn-ghost text-2xl hover:scale-105 transition-transform duration-300 text-primary" href="/">      
+      {SITE_TITLE}      
+    </a>      
+  </div>      
+      
+  <div class="navbar-end">      
+    <ThemeToggle className="navbar-theme text-white" />      
+  </div>      
+      
+  <div      
+    id="header-menu"      
+    class="absolute top-full left-0 w-full transform -translate-x-full transition-transform duration-300 ease-in-out bg-base-100 shadow-lg"      
+  >      
+    <ul class="menu bg-transparent w-full p-2">      
+      {      
+        typedMenu.map((item) => (      
+          <li class="w-full relative group">      
+            {item.subItems ? (      
+              <details open={currentPath.startsWith(item.href)}>      
+                <summary class="flex items-center text-lg font-bold p-3 hover:bg-base-200 rounded-lg">      
+                  <Icon name={item.svg} class="w-5 h-5 mr-2" />      
+                  <span>{item.text}</span>      
+                </summary>      
+                <ul class="pl-4">      
+                  {item.subItems.map((subItem) => (      
+                    <li>      
+                      <a      
+                        class:list={[      
+                          "flex items-center p-2 hover:bg-base-200 rounded-lg",      
+                          currentPath === subItem.href && "bg-base-200",      
+                        ]}      
+                        href={subItem.href}      
+                        target={subItem.target || "_self"}      
+                      >      
+                        <Icon name={subItem.svg} class="w-4 h-4 mr-2" />      
+                        <span>{subItem.text}</span>      
+                      </a>      
+                    </li>      
+                  ))}      
+                </ul>      
+              </details>      
+            ) : (      
+              <a      
+                class:list={[      
+                  "flex items-center text-lg font-bold p-3 hover:bg-base-200 rounded-lg",      
+                  currentPath === item.href && "bg-base-200",      
+                ]}      
+                href={item.href}      
+                target={item.target || "_self"}      
+              >      
+                <Icon name={item.svg} class="w-5 h-5 mr-2" />      
+                <span>{item.text}</span>      
+              </a>      
+            )}      
+          </li>      
+        ))      
+      }      
+    </ul>      
+  </div>      
+</nav>      
+      
+<script>      
+  document.addEventListener("astro:page-load", () => {      
+    let lastScrollY = window.scrollY;      
+    const navbar = document.getElementById("navbar");      
+    const headerMenu = document.getElementById("header-menu");      
+    const menuToggle = document.getElementById("menu-toggle") as HTMLInputElement | null;      
+      
+    if (!navbar || !headerMenu || !menuToggle) return;      
+      
+    // Toggle menu visibility      
+    menuToggle.addEventListener("change", () => {      
+      if (menuToggle.checked) {      
+        headerMenu.classList.remove("-translate-x-full");      
+        headerMenu.classList.add("translate-x-0");      
+      } else {      
+        headerMenu.classList.add("-translate-x-full");      
+        headerMenu.classList.remove("translate-x-0");      
+      }      
+    });      
+      
+    function handleScroll() {      
+      if (!navbar || !headerMenu || !menuToggle) return;      
+      
+      if (window.scrollY > lastScrollY && window.scrollY > 50) {      
+        navbar.classList.add("-translate-y-full", "duration-500");      
+        navbar.classList.remove("translate-y-0");      
+      
+        // Close menu when hiding navbar      
+        if (menuToggle.checked) {      
+          menuToggle.checked = false;      
+          headerMenu.classList.add("-translate-x-full");      
+          headerMenu.classList.remove("translate-x-0");      
+        }      
+      } else if (window.scrollY < lastScrollY) {      
+        navbar.classList.remove("-translate-y-full");      
+        navbar.classList.add("translate-y-0", "duration-300");      
+      }      
+      
+      lastScrollY = window.scrollY;      
+    }      
+      
+    // Throttle scroll event for better performance      
+    let ticking = false;      
+    window.addEventListener("scroll", () => {      
+      if (!ticking) {      
+        window.requestAnimationFrame(() => {      
+          handleScroll();      
+          ticking = false;      
+        });      
+        ticking = true;      
+      }      
+    });      
+      
+    // Close menu when clicking outside      
+    document.addEventListener("click", (event) => {      
+      if (!navbar || !headerMenu || !menuToggle) return;      
+      
+      const target = event.target as Node;      
+      if (!navbar.contains(target) && headerMenu.classList.contains("translate-x-0")) {      
+        menuToggle.checked = false;      
+        headerMenu.classList.add("-translate-x-full");      
+        headerMenu.classList.remove("translate-x-0");      
+      }      
+    });      
+      
+    // Close menu when clicking menu items      
+    const menuItems = document.querySelectorAll("#header-menu a");      
+    menuItems.forEach((item) => {      
+      item.addEventListener("click", () => {      
+        if (!headerMenu || !menuToggle) return;      
+      
+        if (menuToggle.checked) {      
+          menuToggle.checked = false;      
+          headerMenu.classList.add("-translate-x-full");      
+          headerMenu.classList.remove("translate-x-0");      
+        }      
+      });      
+    });      
+  });      
+</script>
