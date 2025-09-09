@@ -15,6 +15,7 @@ import Header from "@components/Header.astro";
 import Sidebar from "@components/Sidebar.astro";
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
+import { initSakura } from "../utils/sakura";
 import Banner from "@components/Banner.astro";
 import MobileTOC from "@components/widgets/MobileTOC.astro";
 
@@ -140,7 +141,25 @@ const bannerSubtitle = pageConfig?.subtitle || "";
       </div>
     </div>
 
+
     <MobileTOC headings={headings} showTOC={showTOC} />
+
+    <!-- 全局樱花飘落特效 -->
+  <script src="/sakura.js" is:inline></script>
+    <script is:inline>
+      window.initSakura && window.initSakura({
+        enable: true,
+        sakuraNum: 30,
+        limitTimes: -1,
+        zIndex: 9999,
+        size: { min: 0.6, max: 1.2 },
+        speed: {
+          horizontal: { min: -2, max: -0.5 }, // 负值让花瓣从右往左
+          vertical: { min: 1.2, max: 2.2 },
+          rotation: 0.01,
+        },
+      });
+    </script>
 
     <!-- 其余脚本保持不变 -->
     <script define:vars={{ SITE_THEME }} is:inline>
