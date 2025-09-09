@@ -3,16 +3,16 @@ A clean, elegant, and fast static blog template! 🚀 Built with Astro
 </pre>
 
 <div align="center">
-<img alt="Frosti Logo" src="https://github.com/EveSunMaple/Frosti/blob/main/docs/logo.png" width="280px">
+<img alt="Ryuchan Logo" src="https://picbed.xiaozhangya.xin/blog/logo.png" width="280px">
 </div>
 
-[![license](https://badgen.net/github/license/EveSunMaple/Frosti)](https://github.com/EveSunMaple/Frosti/blob/main/LICENSE)&nbsp;&nbsp;&nbsp;[![release](https://badgen.net/github/release/EveSunMaple/Frosti)](https://github.com/EveSunMaple/Frosti/releases)&nbsp;&nbsp;&nbsp;[![stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/EveSunMaple/Frosti)
+[![license](https://badgen.net/github/license/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/blob/main/LICENSE)&nbsp;&nbsp;&nbsp;[![release](https://badgen.net/github/release/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/releases)
 
-[**🖥️ Frosti Demo**](https://frosti.saroprock.com)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;[**🌏 Chinese README**](https://github.com/EveSunMaple/Frosti/blob/main/docs/README.zh-CN.md)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;[**❤️ My Blog**](https://www.saroprock.com)
+[**🖥️ Ryuchan Demo**](https://demo.131714.xyz)
 
 ## 📷 Preview
 
-![preview](./docs/preview-light.png)
+![preview](https://picbed.xiaozhangya.xin/blog/preview-dark.png)
 
 ## ✨ Features
 
@@ -23,7 +23,7 @@ A clean, elegant, and fast static blog template! 🚀 Built with Astro
 - ✅ Responsive design built with [Tailwind CSS](https://tailwindcss.com/) and [daisyUI](https://daisyui.com/)
 - ✅ RSS feed support
 - 🛠️ Easy to use blog
-  - Customize your blog content in `frosti.config.yaml`
+  - Customize your blog content in `ryuchan.config.yaml`
 
 ## ✒️ Article Information
 
@@ -54,13 +54,13 @@ npm i -g pnpm
 2. Clone the project
 
 ```sh
-git clone https://github.com/EveSunMaple/Frosti.git Frosti
+git clone https://github.com/xz131714/RyuChan.git Ryuchan
 ```
 
 3. Enter the project folder
 
 ```sh
-cd Frosti
+cd Ryuchan
 ```
 
 4. Install dependencies
@@ -82,14 +82,14 @@ pnpm run dev
 
 ## 🔧 Configuration
 
-Frosti uses `frosti.config.yaml` as its configuration file, where you can configure the website's basic information, navigation bar, footer, and more.
+Ryuchan uses `ryuchan.config.yaml` as its configuration file, where you can configure the website's basic information, navigation bar, footer, and more.
 
 ### Website Basic Information (site)
 
 ```yaml
 site:
-  tab: Frosti # Text displayed in the browser tab
-  title: Frosti # Website title
+  tab: Ryuchan # Text displayed in the browser tab
+  title: Ryuchan # Website title
   description: A clean, elegant, and fast static blog template! # Website description for SEO
   language: en # Website language code, e.g., "en" for English, "zh" for Chinese
   favicon: /favicon.ico # Website favicon path
@@ -140,7 +140,7 @@ You can configure sub-menu items by adding `subItems` with the same format as ma
 
 ```yaml
 user:
-  name: EveSunMaple # Username
+  name: xz131714 # Username
   site: "https://example.com" # User website
   avatar: /profile.png # User avatar
 ```
@@ -160,13 +160,13 @@ sidebar:
 
 ### Icon Settings (icon)
 
-Frosti uses [Iconify](https://icon-sets.iconify.design/) as its icon library. You can search for icons you like on their website, then copy the icon code to the `svg` field in the configuration file.
+Ryuchan uses [Iconify](https://icon-sets.iconify.design/) as its icon library. You can search for icons you like on their website, then copy the icon code to the `svg` field in the configuration file.
 
 ### Language Settings (language)
 
-Frosti supports multiple languages, configured through:
+Ryuchan supports multiple languages, configured through:
 
-1. Setting the default language in `frosti.config.yaml`:
+1. Setting the default language in `ryuchan.config.yaml`:
 
 ```yaml
 site:
@@ -194,19 +194,19 @@ zh: # Chinese translations
 To add new language support or modify existing translations:
 
 1. Add a new language code and corresponding translations in the `translations.yaml` file, or modify existing translations
-2. Change `site.language` in `frosti.config.yaml` to your preferred language code
+2. Change `site.language` in `ryuchan.config.yaml` to your preferred language code
 
 ## 🚀 Automatic Updates
 
-To keep your project up to date with the latest version of Frosti, you can use the provided update script.
+To keep your project up to date with the latest version of Ryuchan, you can use the provided update script.
 
 ```sh
-bash frosti.update.sh
+bash ryuchan.update.sh
 ```
 
 This script will:
 
-1.  **Clone the latest version** of the Frosti repository.
+1.  **Clone the latest version** of the Ryuchan repository.
 2.  **Safely update** your project files, adding and overwriting files based on the `.updateignore` file.
 3.  **Intelligently delete** files that have been removed from the official repository, without affecting your ignored files.
 4.  **Clean up** any remaining empty folders and temporary files.
@@ -218,6 +218,7 @@ If you have any questions or suggestions, you can provide feedback or communicat
 
 ## 🎉 Acknowledgements
 
-@[Saicaca](https://github.com/saicaca) Their inspiration was the main reason I created this theme
+@[EveSunMaple](https://github.com/EveSunMaple) This blog template is a secondary creation based on their [Frosti](https://github.com/EveSunMaple/Frosti) template!
 
-@[WRXinYue](https://github.com/WRXinYue) They helped me a lot when I was first getting started
+@[WhitePaper233](https://github.com/WhitePaper233) 
+Some design elements of this blog are inspired by their [yukina](https://github.com/WhitePaper233/yukina) project!

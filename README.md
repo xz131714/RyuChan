@@ -3,27 +3,27 @@
 </pre>
 
 <div align="center">
-<img alt="Frosti Logo" src="https://github.com/EveSunMaple/Frosti/blob/main/docs/logo.png" width="280px">
+<img alt="Ryuchan Logo" src="https://picbed.xiaozhangya.xin/blog/log.png" width="280px">
 </div>
 
-[![license](https://badgen.net/github/license/EveSunMaple/Frosti)](https://github.com/EveSunMaple/Frosti/blob/main/LICENSE)&nbsp;&nbsp;&nbsp;[![release](https://badgen.net/github/release/EveSunMaple/Frosti)](https://github.com/EveSunMaple/Frosti/releases)&nbsp;&nbsp;&nbsp;[![stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/EveSunMaple/Frosti)
+[![license](https://badgen.net/github/license/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/blob/main/LICENSE)&nbsp;&nbsp;&nbsp;[![release](https://badgen.net/github/release/xz131714/RyuChan)](https://github.com/xz131714/RyuChan/releases)
 
-[**🖥️ Frosti Demo**](https://frosti.saroprock.com)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;[**🌏 中文 README**](https://github.com/EveSunMaple/Frosti/blob/main/docs/README.zh-CN.md)&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;[**❤️ My Blog**](https://www.saroprock.com)
+[**🖥️ Ryuchan Demo**](https://demo.131714.xyz)
 
-## 📷 Preview
+## 📷 预览
 
-![preview](./preview-light.png)
+![preview](https://picbed.xiaozhangya.xin/blog/preview-dark.png)
 
 ## ✨ 特点
 
 - ✅ **白天** / **黑夜** 模式可用
 - ✅ 极速的访问速度与优秀的 SEO
 - ✅ 视图过渡动画（使用 ClientRouter）
-- ✅ 您可以搜索您的文章（使用 Pagefind）
+- ✅ 支持文章全文搜索（Pagefind）
 - ✅ 使用 [Tailwind CSS](https://tailwindcss.com/) 与 [daisyUI](https://daisyui.com/) 构建自适应页面
 - ✅ RSS 订阅支持
 - 🛠️ 博客易上手
-  - 可以在 `frosti.config.yaml` 自定义您博客的内容
+  - 只需在 `ryuchan.config.yaml` 配置你的博客内容
 
 ## ✒️ 文章信息
 
@@ -40,12 +40,12 @@
 
 > [!TIP]
 >
-> - 您可以通过把 `badge` 属性设置为 `Pin` 来置顶您的文章
+> - 你可以通过把 `badge` 属性设置为 `Pin` 来置顶你的文章
 > - 设置 `draft: true` 可将文章标记为草稿，草稿文章不会在列表显示
 
 ## ⬇️ 使用方法
 
-1. 安装pnpm包管理器（如果您没有安装过的话）
+1. 安装 pnpm 包管理器（如果你没有安装过的话）
 
 ```sh
 npm i -g pnpm
@@ -54,13 +54,13 @@ npm i -g pnpm
 2. 克隆项目
 
 ```sh
-git clone https://github.com/EveSunMaple/Frosti.git Frosti
+git clone https://github.com/xz131714/RyuChan.git Ryuchan
 ```
 
 3. 进入项目文件夹
 
 ```sh
-cd Frosti
+cd Ryuchan
 ```
 
 4. 安装依赖
@@ -82,16 +82,16 @@ pnpm run dev
 
 ## 🔧 配置
 
-Frosti 使用 `frosti.config.yaml` 作为配置文件，您可以在此文件中配置网站的基本信息、导航栏、页脚等内容。
+Ryuchan 使用 `ryuchan.config.yaml` 作为配置文件，你可以在此文件中配置网站的基本信息、导航栏、页脚等内容。
 
 ### 网站基本信息 (site)
 
 ```yaml
 site:
-  tab: Frosti # 浏览器标签栏上显示的文本
-  title: Frosti # 网站的主标题
+  tab: Ryuchan # 浏览器标签栏上显示的文本
+  title: Ryuchan # 网站的主标题
   description: A clean, elegant, and fast static blog template! # 网站描述，用于SEO
-  language: en # 网站的语言代码，如"en"表示英文，"zh"表示中文
+  language: zh # 网站的语言代码，如"en"表示英文，"zh"表示中文
   favicon: /favicon.ico # 网站图标路径
 ```
 
@@ -134,13 +134,13 @@ menu:
 
 #### 子菜单项 (subItems)
 
-您可以通过添加 `subItems` 配置子菜单项，格式与主菜单项相同。
+你可以通过添加 `subItems` 配置子菜单项，格式与主菜单项相同。
 
 ### 用户信息 (user)
 
 ```yaml
 user:
-  name: EveSunMaple # 用户名称
+  name: xz131714 # 用户名称
   site: "https://example.com" # 用户网站
   avatar: /profile.png # 用户头像
 ```
@@ -152,7 +152,7 @@ user:
 ```yaml
 sidebar:
   social:
-    - href: "https://github.com/username" # 链接地址
+    - href: "https://github.com/xz131714" # 链接地址
       ariaLabel: Github # 无障碍标签
       title: Github # 鼠标悬停时的提示
       svg: "ri:github-line" # 图标代码
@@ -160,13 +160,13 @@ sidebar:
 
 ### 图标设置 (icon)
 
-Frosti 使用 [Iconify](https://icon-sets.iconify.design/) 作为图标库。您可以在其网站上搜索您喜欢的图标，然后复制图标的代码到配置文件中的 `svg` 字段。
+Ryuchan 使用 [Iconify](https://icon-sets.iconify.design/) 作为图标库。你可以在其网站上搜索你喜欢的图标，然后复制图标的代码到配置文件中的 `svg` 字段。
 
 ### 语言设置 (language)
 
-Frosti 支持多语言，通过以下方式配置：
+Ryuchan 支持多语言，通过以下方式配置：
 
-1. 在 `frosti.config.yaml` 中设置网站默认语言：
+1. 在 `ryuchan.config.yaml` 中设置网站默认语言：
 
 ```yaml
 site:
@@ -194,30 +194,32 @@ zh: # 中文翻译
 要添加新的语言支持或修改现有翻译：
 
 1. 在 `translations.yaml` 文件中添加新的语言代码和对应翻译，或修改现有翻译
-2. 在 `frosti.config.yaml` 中更改 `site.language` 为您要使用的语言代码
+2. 在 `ryuchan.config.yaml` 中更改 `site.language` 为你要使用的语言代码
 
 ## 🚀 自动更新
 
-为了让您的项目与 Frosti 的最新版本保持同步，您可以使用我们提供的更新脚本。
+你可以使用我们提供的更新脚本保持项目与 Ryuchan 的最新版本同步：
 
 ```sh
-bash frosti.update.sh
+bash ryuchan.update.sh
 ```
 
 该脚本将：
 
-1.  **克隆最新版本** 的 Frosti 仓库。
-2.  **安全地更新** 您的项目文件，根据 `.updateignore` 文件添加和覆盖文件。
-3.  **智能地删除** 官方仓库中已移除的文件，而不会影响您忽略的文件。
+1.  **克隆最新版本** 的 Ryuchan 仓库。
+2.  **安全地更新** 你的项目文件，根据 `.updateignore` 文件添加和覆盖文件。
+3.  **智能地删除** 官方仓库中已移除的文件，而不会影响你忽略的文件。
 4.  **清理** 任何残留的空文件夹和临时文件。
 5.  使用 `pnpm` **安装或更新** 依赖项。
 
 ## 👀 问题
 
-如果您有任何问题或建议，可以通过提交 Issues 来反馈或同开发者交流！
+如果你有任何问题或建议，可以通过提交 Issues 来反馈或同开发者交流！
 
 ## 🎉 感谢
 
-@[Saicaca](https://github.com/saicaca) 他的启迪是我制作此主题的主要原因
 
-@[WRXinYue](https://github.com/WRXinYue) 在我前期入门时帮助了我很多
+@[EveSunMaple](https://github.com/EveSunMaple) 本博客模板在其[Frosti](https://github.com/EveSunMaple/Frosti)模板基础上进行二创！
+
+@[WhitePaper233](https://github.com/WhitePaper233) 
+本博客部分设计，参考自其[yukina](https://github.com/WhitePaper233/yukina)！
