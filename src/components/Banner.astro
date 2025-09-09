@@ -1,187 +1,226 @@
----    
-import { BANNER_IMAGES, BANNER_HEIGHT, SITE_PAGES, TYPEWRITER_TEXTS } from "@config";    
-    
-export interface Props {    
-  title?: string;    
-  subtitle?: string;    
-}    
-    
-const { title, subtitle } = Astro.props;    
-    
-// 根据当前路径判断页面类型    
-const currentPath = Astro.url.pathname;    
-const isHomePage = currentPath === '/';    
-const isAboutPage = currentPath === '/about';    
-const isBlogPostPage = currentPath.startsWith('/blog/') && !currentPath.includes('/blog/page/') && currentPath !== '/blog' && !currentPath.includes('/blog/tag/') && !currentPath.includes('/blog/category/');    
-    
-// 判断是否使用大字体（首页、关于、博客文章详情页）    
-const useLargeFont = isHomePage || isAboutPage || isBlogPostPage;    
-    
-// 判断是否使用打字机效果（首页和文章详情页）  
-const useTypewriter = isHomePage || isBlogPostPage;  
-    
-// 如果是大字体页面，使用首页的标题和副标题    
-const displayTitle = useLargeFont ? SITE_PAGES?.home?.title : title;    
-const displaySubtitle = useLargeFont ? SITE_PAGES?.home?.subtitle : subtitle;    
-    
-const hasTitle = displayTitle !== undefined && displayTitle !== "";    
-const hasSubtitle = displaySubtitle !== undefined && displaySubtitle !== "";    
-    
-// 只使用配置中的图片列表    
-let carouselImgsList = BANNER_IMAGES;    
-const carouselAnimationTime = `${carouselImgsList.length * 6}s`;    
-const bannerHeight = BANNER_HEIGHT;    
----    
-    
-<div id="banner" class="banner">    
-  <div class="banner-inner h-full w-full">    
-    <!-- 始终显示轮播图片 -->    
-    <div class="carousel">    
-      <ul id="carousel_imgs">    
-        {carouselImgsList.map((img, index) => (    
-          <li    
-            class="item"    
-            style={{ animationDelay: `${index * 6}s` }}    
-            data-background-image={img}    
-          />    
-        ))}    
-      </ul>    
-    </div>    
-        
-    <!-- 显示标题和副标题 -->    
-    {(hasTitle || hasSubtitle) && (    
-      <div class="relative h-[95%] w-full">    
-        <div class="absolute left-1/2 top-1/2 w-4/5 -translate-x-1/2 -translate-y-1/2 lg:w-3/4">    
-          <div class="flex flex-col">    
-            {hasTitle && (    
-              <h1 class={`title ${useLargeFont ? 'text-6xl lg:text-8xl' : 'text-4xl lg:text-6xl'}`}>    
-                {displayTitle}    
-              </h1>    
-            )}    
-            {hasSubtitle && (    
-              <h2 class={`subtitle ${useLargeFont ? 'text-2xl lg:text-4xl' : 'text-lg lg:text-2xl'}`}>    
-                {useTypewriter ? (    
-                  <span id="typewriter-text">{displaySubtitle}</span>    
-                ) : (    
-                  displaySubtitle    
-                )}    
-              </h2>    
-            )}    
-          </div>    
-        </div>    
-      </div>    
-    )}    
-  </div>    
-      
-  <!-- 波浪动画效果 -->    
-  <div class="waves">    
-    <svg    
-      class="waves"    
-      xmlns="http://www.w3.org/2000/svg"    
-      xmlns:xlink="http://www.w3.org/1999/xlink"    
-      viewBox="0 24 150 28"    
-      preserveAspectRatio="none"    
-      shape-rendering="auto"    
-    >    
-      <defs>    
-        <path    
-          id="gentle-wave"    
-          d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"    
-        />    
-      </defs>    
-      <g class="parallax">    
-        <use    
-          xlink:href="#gentle-wave"    
-          x="48"    
-          y="0"    
-          class="opacity-25"    
-          style={{ animationDelay: "-2s", animationDuration: "7s" }}></use>    
-        <use    
-          xlink:href="#gentle-wave"    
-          x="48"    
-          y="3"    
-          class="opacity-50"    
-          style={{ animationDelay: "-3s", animationDuration: "10s" }}></use>    
-        <use    
-          xlink:href="#gentle-wave"    
-          x="48"    
-          y="5"    
-          class="opacity-75"    
-          style={{ animationDelay: "-4s", animationDuration: "13s" }}></use>    
-        <use    
-          xlink:href="#gentle-wave"    
-          x="48"    
-          y="7"    
-          style={{ animationDelay: "-5s", animationDuration: "20s" }}></use>    
-      </g>    
-    </svg>    
-  </div>    
-</div>    
-    
-<!-- 打字机效果脚本 -->    
-<script define:vars={{ TYPEWRITER_TEXTS, useTypewriter }} is:inline>    
-  document.addEventListener("astro:page-load", () => {    
-    if (!useTypewriter || !TYPEWRITER_TEXTS || TYPEWRITER_TEXTS.length === 0) {    
-      return;    
-    }    
-    
-    const typewriterElement = document.getElementById("typewriter-text");    
-    if (!typewriterElement) return;    
-    
-    let currentTextIndex = 0;    
-    let currentCharIndex = 0;    
-    let isDeleting = false;    
-    let typeSpeed = 50; // 优化：减少打字速度延迟    
-    let deleteSpeed = 30; // 优化：减少删除速度延迟    
-    let pauseTime = 1500; // 优化：减少暂停时间    
-    
-    function typeWriter() {    
-      const currentText = TYPEWRITER_TEXTS[currentTextIndex];    
-          
-      if (isDeleting) {    
-        // 删除字符    
-        typewriterElement.textContent = currentText.substring(0, currentCharIndex - 1);    
-        currentCharIndex--;    
-            
-        if (currentCharIndex === 0) {    
-          isDeleting = false;    
-          currentTextIndex = (currentTextIndex + 1) % TYPEWRITER_TEXTS.length;    
-          setTimeout(typeWriter, 300); // 优化：减少删除完成后的暂停时间    
-          return;    
-        }    
-            
-        setTimeout(typeWriter, deleteSpeed);    
-      } else {    
-        // 添加字符    
-        typewriterElement.textContent = currentText.substring(0, currentCharIndex + 1);    
-        currentCharIndex++;    
-            
-        if (currentCharIndex === currentText.length) {    
-          // 当前句子完成，暂停后开始删除    
-          setTimeout(() => {    
-            isDeleting = true;    
-            typeWriter();    
-          }, pauseTime);    
-          return;    
-        }    
-            
-        setTimeout(typeWriter, typeSpeed);    
-      }    
-    }    
-    
-    // 优化：减少初始延迟时间    
-    setTimeout(typeWriter, 500);    
-  });    
-</script>    
-    
-<!-- 现有的轮播图片脚本 -->    
-<script>    
-  document.addEventListener("astro:page-load", () => {    
-    const styleElement = document.createElement("style");    
-    const carouselImgs = document.getElementById("carousel_imgs");    
-    const carouselImgsCount = carouselImgs?.children.length ?? 0;    
-    
-    if (carouselImgsCount > 0) {    
+---
+import {
+  BANNER_IMAGES,
+  BANNER_HEIGHT,
+  SITE_PAGES,
+  TYPEWRITER_TEXTS,
+} from "@config";
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+
+// 统一所有页面都只用配置文件 SITE_PAGES
+const currentPath = Astro.url.pathname;
+let pageKey = "home";
+if (currentPath === "/") {
+  pageKey = "home";
+} else if (currentPath === "/about") {
+  pageKey = "about";
+} else if (
+  currentPath.startsWith("/blog/") &&
+  !currentPath.includes("/blog/page/") &&
+  currentPath !== "/blog" &&
+  !currentPath.includes("/blog/tag/") &&
+  !currentPath.includes("/blog/category/")
+) {
+  pageKey = "home"; // 博客详情页也用 home 配置
+} else {
+  // 其它页面如 /anime、/friend、/project、/navigation 等
+  pageKey = currentPath.replace(/^\//, "");
+}
+const pageConfig = SITE_PAGES?.[pageKey] || {};
+const useLargeFont =
+  pageKey === "home" ||
+  (currentPath.startsWith("/blog/") &&
+    !currentPath.includes("/blog/page/") &&
+    currentPath !== "/blog" &&
+    !currentPath.includes("/blog/tag/") &&
+    !currentPath.includes("/blog/category/"));
+const useTypewriter =
+  pageKey === "home" ||
+  (currentPath.startsWith("/blog/") &&
+    !currentPath.includes("/blog/page/") &&
+    currentPath !== "/blog" &&
+    !currentPath.includes("/blog/tag/") &&
+    !currentPath.includes("/blog/category/"));
+const displayTitle = pageConfig.title || "";
+const displaySubtitle = pageConfig.subtitle || "";
+const hasTitle = displayTitle !== undefined && displayTitle !== "";
+const hasSubtitle = displaySubtitle !== undefined && displaySubtitle !== "";
+
+// 只使用配置中的图片列表
+let carouselImgsList = BANNER_IMAGES;
+const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
+const bannerHeight = BANNER_HEIGHT;
+---
+
+<div id="banner" class="banner">
+  <div class="banner-inner h-full w-full">
+    <!-- 始终显示轮播图片 -->
+    <div class="carousel">
+      <ul id="carousel_imgs">
+        {
+          carouselImgsList.map((img, index) => (
+            <li
+              class="item"
+              style={{ animationDelay: `${index * 6}s` }}
+              data-background-image={img}
+            />
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- 显示标题和副标题 -->
+    {
+      (hasTitle || hasSubtitle) && (
+        <div class="relative h-[95%] w-full">
+          <div class="absolute left-1/2 top-1/2 w-4/5 -translate-x-1/2 -translate-y-1/2 lg:w-3/4">
+            <div class="flex flex-col">
+              {hasTitle && (
+                <h1
+                  class={`title ${useLargeFont ? "text-6xl lg:text-8xl" : "text-4xl lg:text-6xl"}`}
+                >
+                  {displayTitle}
+                </h1>
+              )}
+              {hasSubtitle && (
+                <h2
+                  class={`subtitle ${useLargeFont ? "text-2xl lg:text-4xl" : "text-lg lg:text-2xl"}`}
+                >
+                  {useTypewriter ? (
+                    <span id="typewriter-text">{displaySubtitle}</span>
+                  ) : (
+                    displaySubtitle
+                  )}
+                </h2>
+              )}
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <!-- 波浪动画效果 -->
+  <div class="waves">
+    <svg
+      class="waves"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 24 150 28"
+      preserveAspectRatio="none"
+      shape-rendering="auto"
+    >
+      <defs>
+        <path
+          id="gentle-wave"
+          d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+        ></path>
+      </defs>
+      <g class="parallax">
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="0"
+          class="opacity-25"
+          style={{ animationDelay: "-2s", animationDuration: "7s" }}></use>
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="3"
+          class="opacity-50"
+          style={{ animationDelay: "-3s", animationDuration: "10s" }}></use>
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="5"
+          class="opacity-75"
+          style={{ animationDelay: "-4s", animationDuration: "13s" }}></use>
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="7"
+          style={{ animationDelay: "-5s", animationDuration: "20s" }}></use>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- 打字机效果脚本 -->
+<script define:vars={{ TYPEWRITER_TEXTS, useTypewriter }} is:inline>
+  document.addEventListener("astro:page-load", () => {
+    if (!useTypewriter || !TYPEWRITER_TEXTS || TYPEWRITER_TEXTS.length === 0) {
+      return;
+    }
+
+    const typewriterElement = document.getElementById("typewriter-text");
+    if (!typewriterElement) return;
+
+    let currentTextIndex = 0;
+    let currentCharIndex = 0;
+    let isDeleting = false;
+    let typeSpeed = 50; // 优化：减少打字速度延迟
+    let deleteSpeed = 30; // 优化：减少删除速度延迟
+    let pauseTime = 1500; // 优化：减少暂停时间
+
+    function typeWriter() {
+      const currentText = TYPEWRITER_TEXTS[currentTextIndex];
+
+      if (isDeleting) {
+        // 删除字符
+        typewriterElement.textContent = currentText.substring(
+          0,
+          currentCharIndex - 1,
+        );
+        currentCharIndex--;
+
+        if (currentCharIndex === 0) {
+          isDeleting = false;
+          currentTextIndex = (currentTextIndex + 1) % TYPEWRITER_TEXTS.length;
+          setTimeout(typeWriter, 300); // 优化：减少删除完成后的暂停时间
+          return;
+        }
+
+        setTimeout(typeWriter, deleteSpeed);
+      } else {
+        // 添加字符
+        typewriterElement.textContent = currentText.substring(
+          0,
+          currentCharIndex + 1,
+        );
+        currentCharIndex++;
+
+        if (currentCharIndex === currentText.length) {
+          // 当前句子完成，暂停后开始删除
+          setTimeout(() => {
+            isDeleting = true;
+            typeWriter();
+          }, pauseTime);
+          return;
+        }
+
+        setTimeout(typeWriter, typeSpeed);
+      }
+    }
+
+    // 优化：减少初始延迟时间
+    setTimeout(typeWriter, 500);
+  });
+</script>
+
+<!-- 现有的轮播图片脚本 -->
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const styleElement = document.createElement("style");
+    const carouselImgs = document.getElementById("carousel_imgs");
+    const carouselImgsCount = carouselImgs?.children.length ?? 0;
+
+    if (carouselImgsCount > 0) {
       const carouselAnimation = `    
       @keyframes carousel-animation {    
         0% {    
@@ -207,90 +246,97 @@ const bannerHeight = BANNER_HEIGHT;
           transform: scale(2);    
         }    
       }    
-      `;    
-      styleElement.textContent = carouselAnimation;    
-      let bannerElement = document.getElementById("banner");    
-      if (bannerElement && !bannerElement.querySelector("style"))    
-        bannerElement.appendChild(styleElement);    
-    }    
-    
-    // 设置背景图片    
-    const items = document.querySelectorAll('#carousel_imgs .item');    
-    items.forEach((item) => {    
-      const bgImage = item.getAttribute('data-background-image');    
-      if (bgImage) {    
-        (item as HTMLElement).style.backgroundImage = `url(${bgImage})`;    
-      }    
-    });    
-  });    
-</script>    
-    
-<style define:vars={{ carouselAnimationTime, bannerHeight }}>    
-  .banner {    
-    @apply relative opacity-100;    
-    height: var(--bannerHeight);    
-  }    
-    
-  .carousel {    
-    @apply absolute left-0 top-0 -z-10 block w-full overflow-hidden bg-base-200;    
-    height: var(--bannerHeight);    
-  }    
-    
-  .carousel::before {    
-    @apply absolute left-0 top-0 z-10 block h-full w-full bg-black/25 transition-all content-[''];    
-    @apply dark:bg-black/30;    
-  }    
-    
-  .carousel .item {    
-    @apply absolute left-0 top-0 z-0 h-full w-full origin-center bg-cover bg-center bg-no-repeat opacity-0;    
-    animation: carousel-animation var(--carouselAnimationTime) linear infinite 0s;    
-    backface-visibility: hidden;    
-    transform-style: preserve-3d;    
-  }    
-    
-  .title {    
-    @apply mt-8 text-center font-bold drop-shadow-lg lg:mt-1;    
-    font-family: var(--title-font);    
-    color: white;    
-    line-height: 1.3;  
-  }    
-    
-  .subtitle {    
-    @apply text-center drop-shadow-md;    
-    font-family: var(--subtitle-font);    
-    color: white;    
-    white-space: pre-line;    
-    line-height: 1.3;  
-  }    
-    
-  /* 打字机光标效果 */    
-  #typewriter-text::after {    
-    content: '|';    
-    animation: blink 1s infinite;    
-    color: white;    
-  }    
-    
-  @keyframes blink {    
-    0%, 50% { opacity: 1; }    
-    51%, 100% { opacity: 0; }    
-  }    
-    
-  .waves {    
-    @apply absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full;    
-    @apply md:h-[15vh];    
-  }    
-    
-  .waves > .parallax use {    
-    fill: var(--custom-page-bg);    
-    animation: wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;    
-  }    
-    
-  @keyframes wave {    
-    0% {    
-      transform: translate3d(-90px, 0, 0);    
-    }    
-    100% {    
-      transform: translate3d(85px, 0, 0);    
-    }    
-  }    
+      `;
+      styleElement.textContent = carouselAnimation;
+      let bannerElement = document.getElementById("banner");
+      if (bannerElement && !bannerElement.querySelector("style"))
+        bannerElement.appendChild(styleElement);
+    }
+
+    // 设置背景图片
+    const items = document.querySelectorAll("#carousel_imgs .item");
+    items.forEach((item) => {
+      const bgImage = item.getAttribute("data-background-image");
+      if (bgImage) {
+        (item as HTMLElement).style.backgroundImage = `url(${bgImage})`;
+      }
+    });
+  });
+</script>
+
+<style define:vars={{ carouselAnimationTime, bannerHeight }}>
+  .banner {
+    @apply relative opacity-100;
+    height: var(--bannerHeight);
+  }
+
+  .carousel {
+    @apply absolute left-0 top-0 -z-10 block w-full overflow-hidden bg-base-200;
+    height: var(--bannerHeight);
+  }
+
+  .carousel::before {
+    @apply absolute left-0 top-0 z-10 block h-full w-full bg-black/25 transition-all content-[''];
+    @apply dark:bg-black/30;
+  }
+
+  .carousel .item {
+    @apply absolute left-0 top-0 z-0 h-full w-full origin-center bg-cover bg-center bg-no-repeat opacity-0;
+    animation: carousel-animation var(--carouselAnimationTime) linear infinite
+      0s;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .title {
+    @apply mt-8 text-center font-bold drop-shadow-lg lg:mt-1;
+    font-family: var(--title-font);
+    color: white;
+    line-height: 1.3;
+  }
+
+  .subtitle {
+    @apply text-center drop-shadow-md;
+    font-family: var(--subtitle-font);
+    color: white;
+    white-space: pre-line;
+    line-height: 1.3;
+  }
+
+  /* 打字机光标效果 */
+  #typewriter-text::after {
+    content: "|";
+    animation: blink 1s infinite;
+    color: white;
+  }
+
+  @keyframes blink {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .waves {
+    @apply absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full;
+    @apply md:h-[15vh];
+  }
+
+  .waves > .parallax use {
+    fill: var(--custom-page-bg);
+    animation: wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;
+  }
+
+  @keyframes wave {
+    0% {
+      transform: translate3d(-90px, 0, 0);
+    }
+    100% {
+      transform: translate3d(85px, 0, 0);
+    }
+  }
 </style>
