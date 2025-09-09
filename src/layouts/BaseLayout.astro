@@ -262,9 +262,10 @@ const bannerSubtitle = pageConfig?.subtitle || "";
         };
       })();
       function runSakura() {
+        const isMobile = window.innerWidth <= 768;
         window.initSakura && window.initSakura({
           enable: true,
-          sakuraNum: 30,
+          sakuraNum: isMobile ? 10 : 30,
           limitTimes: -1,
           zIndex: 9999,
           size: { min: 0.6, max: 1.2 },
@@ -276,6 +277,7 @@ const bannerSubtitle = pageConfig?.subtitle || "";
         });
       }
       runSakura();
+      window.addEventListener('resize', runSakura);
       document.addEventListener('astro:after-swap', () => {
         runSakura();
       });

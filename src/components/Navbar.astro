@@ -30,7 +30,7 @@ const typedMenu = SITE_MENU as MenuItem[];
 ---      
       
 <!-- 桌面端透明导航栏 -->      
-<nav class="fixed top-0 left-0 right-0 z-50 hidden md:block">      
+<nav class="fixed top-0 left-0 right-0 z-50 hidden md:block transition-opacity duration-500 opacity-100 pointer-events-auto" id="navbar-desktop">      
   <div class="max-w-blog mx-auto px-4">      
     <!-- 透明背景，添加毛玻璃效果 -->      
     <div class="bg-transparent backdrop-blur-md border-none px-6 py-3 rounded-bl-2xl rounded-br-2xl">      
@@ -103,7 +103,7 @@ const typedMenu = SITE_MENU as MenuItem[];
       
 <!-- 移动端导航栏 - 透明样式 -->      
 <nav      
-  class="navbar fixed px-2 w-full transform transition-transform delay-300 duration-500 ease-in-out text-center z-50 bg-transparent backdrop-blur-md shadow-lg md:hidden"      
+  class="navbar fixed px-2 w-full transform transition-transform transition-opacity delay-300 duration-500 ease-in-out text-center z-50 bg-transparent backdrop-blur-md shadow-lg md:hidden opacity-100 pointer-events-auto"
   id="navbar"      
 >      
   <div class="navbar-start">      
@@ -178,6 +178,32 @@ const typedMenu = SITE_MENU as MenuItem[];
 </nav>      
       
 <script>      
+  document.addEventListener("astro:page-load", () => {
+    // 桌面端导航栏淡入淡出
+    let lastScrollY = window.scrollY;
+    const navbarDesktop = document.getElementById("navbar-desktop");
+    function handleScrollDesktop() {
+      if (!navbarDesktop) return;
+      if (window.scrollY > lastScrollY && window.scrollY > 50) {
+        navbarDesktop.classList.add("opacity-0", "pointer-events-none");
+        navbarDesktop.classList.remove("opacity-100", "pointer-events-auto");
+      } else if (window.scrollY < lastScrollY) {
+        navbarDesktop.classList.remove("opacity-0", "pointer-events-none");
+        navbarDesktop.classList.add("opacity-100", "pointer-events-auto");
+      }
+      lastScrollY = window.scrollY;
+    }
+    let tickingDesktop = false;
+    window.addEventListener("scroll", () => {
+      if (!tickingDesktop) {
+        window.requestAnimationFrame(() => {
+          handleScrollDesktop();
+          tickingDesktop = false;
+        });
+        tickingDesktop = true;
+      }
+    });
+  });
   document.addEventListener("astro:page-load", () => {      
     let lastScrollY = window.scrollY;      
     const navbar = document.getElementById("navbar");      
@@ -200,23 +226,24 @@ const typedMenu = SITE_MENU as MenuItem[];
     function handleScroll() {      
       if (!navbar || !headerMenu || !menuToggle) return;      
       
-      if (window.scrollY > lastScrollY && window.scrollY > 50) {      
-        navbar.classList.add("-translate-y-full", "duration-500");      
-        navbar.classList.remove("translate-y-0");      
-      
-        // Close menu when hiding navbar      
-        if (menuToggle.checked) {      
-          menuToggle.checked = false;      
-          headerMenu.classList.add("-translate-x-full");      
-          headerMenu.classList.remove("translate-x-0");      
-        }      
-      } else if (window.scrollY < lastScrollY) {      
-        navbar.classList.remove("-translate-y-full");      
-        navbar.classList.add("translate-y-0", "duration-300");      
-      }      
-      
-      lastScrollY = window.scrollY;      
-    }      
+
+      if (window.scrollY > lastScrollY && window.scrollY > 50) {
+        navbar.classList.add("-translate-y-full", "duration-500", "opacity-0", "pointer-events-none");
+        navbar.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+
+        // Close menu when hiding navbar
+        if (menuToggle.checked) {
+          menuToggle.checked = false;
+          headerMenu.classList.add("-translate-x-full");
+          headerMenu.classList.remove("translate-x-0");
+        }
+      } else if (window.scrollY < lastScrollY) {
+        navbar.classList.remove("-translate-y-full", "opacity-0", "pointer-events-none");
+        navbar.classList.add("translate-y-0", "duration-300", "opacity-100", "pointer-events-auto");
+      }
+
+      lastScrollY = window.scrollY;
+    }
       
     // Throttle scroll event for better performance      
     let ticking = false;      
